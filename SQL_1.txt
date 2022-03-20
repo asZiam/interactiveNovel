@@ -1,0 +1,15 @@
+((select  
+case invoice 
+when 1 then 'from initial to second invoice' 
+else 'no' 
+end comment,
+round(clients/prev_clients*100,2) conversion_pct
+from (select invoice, clients, LAG(clients) OVER(ORDER BY invoice asc) prev_clients,
+from (SELECT  
+distinct invoices.subscription_term_number as invoice,
+count(invoices.subscription_term_number) clients, 
+FROM elite-thunder-340219.ltv_holy.test , UNNEST(invoices) as invoices
+where invoices.subscription_term_number in (0,1) and invoices.status = 'success'
+group by invoices.subscription_term_number 
+order by invoices.subscription_term_number ASC))
+where invoice = 1))

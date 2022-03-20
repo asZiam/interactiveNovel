@@ -1,0 +1,7 @@
+(select id,clients_term0,clients_term1,round(clients_term1/clients_term0*100,2) as conversion_pct 
+from (select term,id,clients as clients_term1,LAG(clients) OVER(ORDER BY id,term) clients_term0 
+from (select invoices.subscription_term_number as term,product.id as id, count(product.id) clients, 
+FROM elite-thunder-340219.ltv_holy.test, unnest(invoices) invoices
+where invoices.subscription_term_number in (0,1)
+group by invoices.subscription_term_number,product.id) 
+where term = 1))
