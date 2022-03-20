@@ -1,0 +1,22 @@
+(select customer,product, round((avg_total_amount*purchase_freq)/
+                        (case when churn_rate=0 then 1 else churn_rate end),2) as ltv
+from 
+(select customer,product, 
+       days, 
+       term,
+       quantity,
+       total_amount, 
+       round(total_amount/quantity,0) as avg_total_amount, 
+       purchase_freq,
+       repeat_rate,
+       1-repeat_rate as churn_rate
+from 
+(select customer,product, 
+       date_diff(max(date), min(date), day) as days,
+       max(term) as term,
+       sum(term)/count(*) as purchase_freq,
+       sum(quantity) as quantity,
+       sum(total_amount) as total_amount,
+       sum (CASE WHEN term > 0 THEN 1 ELSE 0 END) / COUNT(*) as repeat_rate
+from elite-thunder-340219.ltv_holy.ltv_prepare 
+group by customer,product)))
